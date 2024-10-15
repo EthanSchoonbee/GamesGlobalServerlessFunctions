@@ -78,3 +78,9 @@ Outputs:
     Value: !GetAtt LambdaFunction.Arn
     Export:
       Name: 'LogWriterLambdaFunctionArn'
+
+  LambdaFunctionUrl:
+    Description: 'The URL of the Lambda function'
+    Value: !Ref LambdaFunctionUrl
+    Export:
+      Name: 'LogWriterLambdaFunctionUrl'
