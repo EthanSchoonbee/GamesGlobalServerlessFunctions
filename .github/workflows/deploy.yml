@@ -28,7 +28,7 @@ jobs:
         shell: bash
         id: build-and-push
         run: |
-          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.READER_ECR_REPOSITORY }}:latest
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.READER_ECR_REPO }}:latest
 
           # Build the Docker image
           echo "Building Docker image..."
@@ -60,7 +60,7 @@ jobs:
         shell: bash
         id: build-and-push
         run: |
-          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.WRITER_ECR_REPOSITORY }}:latest
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.WRITER_ECR_REPO }}:latest
 
           # Build the Docker image
           echo "Building Docker image..."
