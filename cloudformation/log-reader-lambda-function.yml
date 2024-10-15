@@ -84,3 +84,11 @@ Outputs:
     Value: !GetAtt LambdaFunctionUrl.FunctionUrl
     Export:
       Name: 'LogReaderLambdaFunctionUrl'
+
+  LambdaFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionName: !Ref LambdaFunction
+      FunctionUrlAuthType: NONE
