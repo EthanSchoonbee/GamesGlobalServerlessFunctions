@@ -51,7 +51,7 @@ Resources:
         ImageUri: !Sub
           - "${ecrRepositoryUri}:latest"
           - ecrRepositoryUri: !ImportValue LogWriterLambdaECRRepositoryUri
-      Timeout: 300
+      Timeout: 15
       MemorySize: 128
       VpcConfig:
         SecurityGroupIds:

@@ -49,7 +49,6 @@ jobs:
             aws cloudformation deploy \
               --template-file cloudformation/dynamodb.yml \
               --stack-name dynamodb-stack
-                
 
   deploy-reader-function:
     runs-on: ubuntu-latest
