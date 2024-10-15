@@ -1,0 +1,71 @@
+name: Deploy to ECR repository
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-read-function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and Push Docker Image
+        working-directory: ./reader
+        shell: bash
+        id: build-and-push
+        run: |
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.READER_ECR_REPOSITORY }}:latest
+
+          # Build the Docker image
+          echo "Building Docker image..."
+          docker build -t $IMAGE_URI .
+
+          # Push the Docker image to ECR
+          echo "Pushing Docker image to $IMAGE_URI..."
+          docker push $IMAGE_URI
+
+  deploy-write-function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and Push Docker Image
+        working-directory: ./writer
+        shell: bash
+        id: build-and-push
+        run: |
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.WRITER_ECR_REPOSITORY }}:latest
+
+          # Build the Docker image
+          echo "Building Docker image..."
+          docker build -t $IMAGE_URI .
+
+          # Push the Docker image to ECR
+          echo "Pushing Docker image to $IMAGE_URI..."
+          docker push $IMAGE_URI
