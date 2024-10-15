@@ -9,9 +9,9 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      cloudformationChanges: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.cloudformation }}
-      logReaderFunctionChanges: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.logReaderFunction }}
-      logWriterFunctionChanges: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.logWriterFunction }}
+      cloudformationChanges: ${{  steps.filter.outputs.cloudformation }}
+      logReaderFunctionChanges: ${{ steps.filter.outputs.logReaderFunction }}
+      logWriterFunctionChanges: ${{  steps.filter.outputs.logWriterFunction }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v3
@@ -19,16 +19,16 @@ jobs:
         with:
           filters: |
             cloudformation:
-              - 'cloudformation/'
+              - 'cloudformation/**'
             logReaderFunction:
-              - 'reader/'
+              - 'reader/**'
             logWriterFunction:
-              - 'writer/'
+              - 'writer/**'
               
 
 
   non-code-dependent-cloud-formation:
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.cloudformationChanges == 'true'
+    if: needs.changes.outputs.cloudformationChanges == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -74,7 +74,7 @@ jobs:
                 
 
   deploy-reader-function:
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.logReaderFunctionChanges == 'true'
+    if: needs.changes.outputs.logReaderFunctionChanges == 'true'
     runs-on: ubuntu-latest
     needs: non-code-dependent-cloud-formation
     steps:
@@ -108,7 +108,7 @@ jobs:
           docker push $IMAGE_URI
 
   deploy-write-function:
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.logWriterFunctionChanges == 'true'
+    if: needs.changes.outputs.logWriterFunctionChanges == 'true'
     runs-on: ubuntu-latest
     needs: non-code-dependent-cloud-formation
     steps:
@@ -142,7 +142,7 @@ jobs:
           docker push $IMAGE_URI
 
   code-dependent-cloud-formation:
-      if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.cloudformationChanges == 'true'
+      if: needs.changes.outputs.cloudformationChanges == 'true'
       runs-on: ubuntu-latest
       needs:
         - deploy-write-function
@@ -183,7 +183,7 @@ jobs:
                 FunctionName=${{ vars.WRITER_FUNCTION_NAME }}
 
   update-log-reader-lambda-function:
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.logReaderFunctionChanges == 'true'
+    if: needs.changes.outputs.logReaderFunctionChanges == 'true'
     runs-on: ubuntu-latest
     needs: code-dependent-cloud-formation
     steps:
@@ -211,7 +211,7 @@ jobs:
 
 
   update-log-writer-lambda-function:
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.logWriterFunctionChanges == 'true'
+    if: needs.changes.outputs.logWriterFunctionChanges == 'true'
     runs-on: ubuntu-latest
     needs: code-dependent-cloud-formation
     steps:
