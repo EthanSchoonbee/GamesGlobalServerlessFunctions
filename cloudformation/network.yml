@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template to create a new VPC with essential components'
+
+Parameters:
+  Region:
+    Type: String
+
+Resources:
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: 'Name'
+          Value: 'vpc'
+
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: 'Name'
+          Value: 'internet-gateway'
+
+  AttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.1.0/24'
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Sub '${Region}a'
+      Tags:
+        - Key: 'Name'
+          Value: 'public-subnet-a'
+
+  PublicSubnetB:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.2.0/24'
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Sub '${Region}b'
+      Tags:
+        - Key: 'Name'
+          Value: 'public-subnet-b'
+
+  PrivateSubnetA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.3.0/24'
+      AvailabilityZone: !Sub '${Region}a'
+      Tags:
+        - Key: 'Name'
+          Value: 'private-subnet-a'
+
+  PrivateSubnetB:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.4.0/24'
+      AvailabilityZone: !Sub '${Region}b'
+      Tags:
+        - Key: 'Name'
+          Value: 'private-subnet-b'
+
+  PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: 'Name'
+          Value: 'public-route-table'
+
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetARouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetBRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: 'Name'
+          Value: 'private-route-table'
+
+  PrivateSubnetARouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnetA
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnetBRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnetB
+      RouteTableId: !Ref PrivateRouteTable
+
+Outputs:
+  VPCId:
+    Description: 'VPC ID'
+    Value: !Ref VPC
+    Export:
+      Name: 'VPCId'
+
+  PublicSubnetAId:
+    Description: 'Public subnet A identifier'
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: 'PublicSubnetAId'
+
+  PublicSubnetBId:
+    Description: 'Public subnet B identifier'
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: 'PublicSubnetBId'
+
+  PrivateSubnetAId:
+    Description: 'Private subnet A identifier'
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: 'PrivateSubnetAId'
+
+  PrivateSubnetBId:
+    Description: 'Private subnet B identifier'
+    Value: !Ref PrivateSubnetB
+    Export:
+      Name: 'PrivateSubnetBId'
+
+  InternetGatewayId:
+    Description: 'Internet gateway identifier'
+    Value: !Ref InternetGateway
+    Export:
+      Name: 'InternetGatewayId'
+
+  PrivateRouteTableId:
+    Description: 'Private route table Identifier'
+    Value: !Ref PrivateRouteTable
+    Export:
+      Name: 'PrivateRouteTableId'

@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template to configure DynamoDB'
+
+Resources:
+  LogEventTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: 'log-events'
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+      BillingMode: 'PAY_PER_REQUEST'
+      StreamSpecification:
+        StreamViewType: 'NEW_AND_OLD_IMAGES'
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+      SSESpecification:
+        SSEEnabled: true
+
+Outputs:
+  LogEventTableArn:
+    Description: 'ARN of LogEvent table'
+    Value: !GetAtt LogEventTable.Arn
+    Export:
+      Name: 'LogEventTableArn'

@@ -6,6 +6,50 @@ on:
       - main
 
 jobs:
+  non-code-dependent-cloud-formation:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: 'Validate CloudFormation templates'
+        shell: bash
+        run: | 
+            aws cloudformation validate-template --template-body file://cloudformation/shared/network.yml
+            aws cloudformation validate-template --template-body file://cloudformation/shared/dynamodb.yml
+            aws cloudformation validate-template --template-body file://cloudformation/shared/ecr.yml
+            aws cloudformation validate-template --template-body file://cloudformation/shared/security-groups.yml
+
+      - name: 'Deploy resources'
+        shell: bash
+        run: |
+            aws cloudformation deploy \
+              --template-file cloudformation/network.yml \
+              --stack-name network-stack \
+              --capabilities CAPABILITY_NAMED_IAM
+            
+            aws cloudformation deploy \
+              --template-file cloudformation/ecr.yml \
+              --stack-name ecr-stack \
+              --parameter-overrides \
+                LogReaderECRRepo = ${{ vars.READER_ECR_REPO }} \
+                LogWriterECRRepo = ${{ vars.WRITER_ECR_REPO }}
+          
+            aws cloudformation deploy \
+              --template-file cloudformation/security-groups.yml \
+              --stack-name security-groups-stack 
+          
+            aws cloudformation deploy \
+              --template-file cloudformation/dynamodb.yml \
+              --stack-name dynamodb-stack
+                
+
   deploy-read-function:
     runs-on: ubuntu-latest
     steps:
@@ -69,3 +113,90 @@ jobs:
           # Push the Docker image to ECR
           echo "Pushing Docker image to $IMAGE_URI..."
           docker push $IMAGE_URI
+
+  code-dependent-cloud-formation:
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v2
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ vars.AWS_REGION }}
+
+        - name: 'Validate CloudFormation templates'
+          shell: bash
+          run: |
+            aws cloudformation validate-template --template-body file://cloudformation/shared/log-reader-lambda-function.yml
+            aws cloudformation validate-template --template-body file://cloudformation/shared/log-writer-lambda-function.yml
+
+        - name: 'Deploy resources'
+          shell: bash
+          run: |
+            
+            aws cloudformation deploy \
+              --template-file cloudformation/log-reader-lambda-function.yml \
+              --stack-name log-reader-lambda-function-stack \
+              --capabilities CAPABILITY_NAMED_IAM \
+              --parameter-overrides \
+                FunctionName = ${{ vars.READER_FUNCTION_NAME }}
+            
+            aws cloudformation deploy \
+              --template-file cloudformation/log-writer-lambda-function.yml \
+              --stack-name log-writer-lambda-function-stack \
+              --capabilities CAPABILITY_NAMED_IAM \ S
+              --parameter-overrides \
+                FunctionName = ${{ vars.WRITER_FUNCTION_NAME }}
+
+  update-log-reader-lambda-function:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Update lambda function
+        shell: bash
+        run: |
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.READER_ECR_REPO }}:latest
+          
+          echo "Updating Lambda function ${{ vars.READER_FUNCTION_NAME }} with image $IMAGE_URI..."
+          aws lambda update-function-code --function-name ${{ vars.READER_FUNCTION_NAME }} --image-uri $IMAGE_URI
+
+
+  update-log-writer-lambda-function:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Update lambda function
+        shell: bash
+        run: |
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.WRITER_ECR_REPO }}:latest
+
+          echo "Updating Lambda function ${{ vars.WRITER_FUNCTION_NAME }} with image $IMAGE_URI..."
+          aws lambda update-function-code --function-name ${{ vars.WRITER_FUNCTION_NAME }} --image-uri $IMAGE_URI
+
+

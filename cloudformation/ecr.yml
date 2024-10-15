@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template to configure API route /hello-world'
+
+Parameters:
+  LogReaderECRRepo:
+    Type: String
+  LogWriterECRRepo:
+    Type: String
+
+Resources:
+  LogReaderLambdaECRRepository:
+    Type: 'AWS::ECR::Repository'
+    Properties:
+      RepositoryName: !Ref LogReaderECRRepo
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+  LogWriterLambdaECRRepository:
+    Type: 'AWS::ECR::Repository'
+    Properties:
+      RepositoryName: !Ref LogWriterECRRepo
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+Outputs:
+  LogReaderLambdaECRRepositoryUri:
+    Description: 'URI of the log-reader-lambda function ECR repository'
+    Value: !GetAtt LogReaderLambdaECRRepository.RepositoryUri
+    Export:
+      Name: 'LogReaderLambdaECRRepositoryUri'
+
+  LogWriterLambdaECRRepositoryUri:
+    Description: 'URI of the log-writer-lambda function ECR repository'
+    Value: !GetAtt LogWriterLambdaECRRepository.RepositoryUri
+    Export:
+      Name: 'LogWriterLambdaECRRepositoryUri'
