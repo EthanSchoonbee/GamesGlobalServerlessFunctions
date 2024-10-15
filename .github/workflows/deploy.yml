@@ -134,7 +134,7 @@ jobs:
             aws-region: ${{ vars.AWS_REGION }}
 
         - name: 'Validate CloudFormation templates'
-          shell: bashs
+          shell: bash
           run: |
             aws cloudformation validate-template --template-body file://cloudformation/log-reader-lambda-function.yml
             aws cloudformation validate-template --template-body file://cloudformation/log-writer-lambda-function.yml
