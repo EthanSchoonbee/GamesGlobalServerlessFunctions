@@ -7,6 +7,7 @@ on:
 
 jobs:
   non-code-dependent-cloud-formation:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -115,6 +116,7 @@ jobs:
           docker push $IMAGE_URI
 
   code-dependent-cloud-formation:
+      runs-on: ubuntu-latest
       steps:
         - name: Checkout code
           uses: actions/checkout@v3
@@ -151,6 +153,7 @@ jobs:
                 FunctionName = ${{ vars.WRITER_FUNCTION_NAME }}
 
   update-log-reader-lambda-function:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -176,6 +179,7 @@ jobs:
 
 
   update-log-writer-lambda-function:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
