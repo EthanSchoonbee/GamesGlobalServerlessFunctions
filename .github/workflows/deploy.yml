@@ -22,10 +22,10 @@ jobs:
       - name: 'Validate CloudFormation templates'
         shell: bash
         run: | 
-            aws cloudformation validate-template --template-body file://cloudformation/shared/network.yml
-            aws cloudformation validate-template --template-body file://cloudformation/shared/dynamodb.yml
-            aws cloudformation validate-template --template-body file://cloudformation/shared/ecr.yml
-            aws cloudformation validate-template --template-body file://cloudformation/shared/security-groups.yml
+            aws cloudformation validate-template --template-body file://cloudformation/network.yml
+            aws cloudformation validate-template --template-body file://cloudformation/dynamodb.yml
+            aws cloudformation validate-template --template-body file://cloudformation/ecr.yml
+            aws cloudformation validate-template --template-body file://cloudformation/security-groups.yml
 
       - name: 'Deploy resources'
         shell: bash
@@ -134,10 +134,10 @@ jobs:
             aws-region: ${{ vars.AWS_REGION }}
 
         - name: 'Validate CloudFormation templates'
-          shell: bash
+          shell: bashs
           run: |
-            aws cloudformation validate-template --template-body file://cloudformation/shared/log-reader-lambda-function.yml
-            aws cloudformation validate-template --template-body file://cloudformation/shared/log-writer-lambda-function.yml
+            aws cloudformation validate-template --template-body file://cloudformation/log-reader-lambda-function.yml
+            aws cloudformation validate-template --template-body file://cloudformation/log-writer-lambda-function.yml
 
         - name: 'Deploy resources'
           shell: bash
