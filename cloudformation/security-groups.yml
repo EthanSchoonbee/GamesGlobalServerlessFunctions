@@ -4,7 +4,7 @@ Description: 'CloudFormation template to create a new VPC with essential compone
 Resources:
 
   LambdaSecurityGroup:
-    Type: 'AWCidrIp::SecurityGroup'
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'Security Group for allowing traffic to lambdas'
       VpcId: !ImportValue VPCId
