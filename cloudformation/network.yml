@@ -1,10 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation template to create a new VPC with essential components'
 
-Parameters:
-  Region:
-    Type: String
-
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -35,7 +31,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: '10.0.1.0/24'
       MapPublicIpOnLaunch: true
-      AvailabilityZone: !Sub '${Region}a'
+      AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
         - Key: 'Name'
           Value: 'public-subnet-a'
@@ -46,7 +42,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: '10.0.2.0/24'
       MapPublicIpOnLaunch: true
-      AvailabilityZone: !Sub '${Region}b'
+      AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: 'Name'
           Value: 'public-subnet-b'
@@ -56,7 +52,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: '10.0.3.0/24'
-      AvailabilityZone: !Sub '${Region}a'
+      AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
         - Key: 'Name'
           Value: 'private-subnet-a'
@@ -66,7 +62,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: '10.0.4.0/24'
-      AvailabilityZone: !Sub '${Region}b'
+      AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: 'Name'
           Value: 'private-subnet-b'
