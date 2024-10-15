@@ -39,8 +39,8 @@ jobs:
               --template-file cloudformation/ecr.yml \
               --stack-name ecr-stack \
               --parameter-overrides \
-                LogReaderECRRepo = ${{ vars.READER_ECR_REPO }} \
-                LogWriterECRRepo = ${{ vars.WRITER_ECR_REPO }}
+                LogReaderECRRepo=${{ vars.READER_ECR_REPO }} \
+                LogWriterECRRepo=${{ vars.WRITER_ECR_REPO }}
           
             aws cloudformation deploy \
               --template-file cloudformation/security-groups.yml \
@@ -148,14 +148,14 @@ jobs:
               --stack-name log-reader-lambda-function-stack \
               --capabilities CAPABILITY_NAMED_IAM \
               --parameter-overrides \
-                FunctionName = ${{ vars.READER_FUNCTION_NAME }}
+                FunctionName=${{ vars.READER_FUNCTION_NAME }}
             
             aws cloudformation deploy \
               --template-file cloudformation/log-writer-lambda-function.yml \
               --stack-name log-writer-lambda-function-stack \
               --capabilities CAPABILITY_NAMED_IAM \ S
               --parameter-overrides \
-                FunctionName = ${{ vars.WRITER_FUNCTION_NAME }}
+                FunctionName=${{ vars.WRITER_FUNCTION_NAME }}
 
   update-log-reader-lambda-function:
     runs-on: ubuntu-latest
