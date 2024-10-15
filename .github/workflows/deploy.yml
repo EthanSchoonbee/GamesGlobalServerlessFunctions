@@ -28,6 +28,7 @@ jobs:
 
 
   non-code-dependent-cloud-formation:
+    needs: changes
     if: needs.changes.outputs.cloudformationChanges == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +77,9 @@ jobs:
   deploy-reader-function:
     if: needs.changes.outputs.logReaderFunctionChanges == 'true'
     runs-on: ubuntu-latest
-    needs: non-code-dependent-cloud-formation
+    needs:
+      - non-code-dependent-cloud-formation
+      - changes
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -110,7 +113,9 @@ jobs:
   deploy-write-function:
     if: needs.changes.outputs.logWriterFunctionChanges == 'true'
     runs-on: ubuntu-latest
-    needs: non-code-dependent-cloud-formation
+    needs:
+       - non-code-dependent-cloud-formation
+       - changes
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -147,6 +152,7 @@ jobs:
       needs:
         - deploy-write-function
         - deploy-reader-function
+        - changes
       steps:
         - name: Checkout code
           uses: actions/checkout@v3
@@ -185,7 +191,9 @@ jobs:
   update-log-reader-lambda-function:
     if: needs.changes.outputs.logReaderFunctionChanges == 'true'
     runs-on: ubuntu-latest
-    needs: code-dependent-cloud-formation
+    needs:
+      - code-dependent-cloud-formation
+      - changes
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -213,7 +221,9 @@ jobs:
   update-log-writer-lambda-function:
     if: needs.changes.outputs.logWriterFunctionChanges == 'true'
     runs-on: ubuntu-latest
-    needs: code-dependent-cloud-formation
+    needs:
+      - code-dependent-cloud-formation
+      - changes
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
