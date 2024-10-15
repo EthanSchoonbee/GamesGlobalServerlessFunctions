@@ -1,0 +1,23 @@
+{
+  "name": "log-writing-service",
+  "version": "1.0.0",
+  "description": "Serverlesdsdg dfsdffor Log",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/uuid": "^10.0.0",
+    "aws-lambda": "^1.0.7"
+  }
+}
