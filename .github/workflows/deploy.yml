@@ -153,7 +153,7 @@ jobs:
             aws cloudformation deploy \
               --template-file cloudformation/log-writer-lambda-function.yml \
               --stack-name log-writer-lambda-function-stack \
-              --capabilities CAPABILITY_NAMED_IAM \ S
+              --capabilities CAPABILITY_NAMED_IAM \
               --parameter-overrides \
                 FunctionName=${{ vars.WRITER_FUNCTION_NAME }}
 
