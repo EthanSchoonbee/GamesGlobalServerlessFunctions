@@ -17,5 +17,5 @@ Resources:
       SecurityGroupIds:
         - !ImportValue LambdaSecurityGroup
       SubnetIds: # Replace with your private subnets
-        - !ImportValue PrivateSubnetA
-        - !ImportValue PrivateSubnetB
+        - !ImportValue PrivateSubnetAId
+        - !ImportValue PrivateSubnetBId
