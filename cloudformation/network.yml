@@ -134,6 +134,15 @@ Resources:
       SubnetId: !Ref PrivateSubnetB          # Reference to Private Subnet B
       RouteTableId: !Ref PrivateRouteTable    # Reference to the private route table
 
+  DynamoDBVpcEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
+      VpcEndpointType: 'Gateway'
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+
 # Resources to export and make available for use in other CloudFormation stacks
 Outputs:
   # Output the ID of the created VPC
