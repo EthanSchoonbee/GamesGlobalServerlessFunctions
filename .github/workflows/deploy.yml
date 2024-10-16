@@ -1,74 +1,98 @@
+# AUTHOR: Ethan Schoonbee
+# EMAIL: schoonbeeethan@gmail.com
+# DATE CREATED: 15/10/2024
+# LAST MODIFIED: 16/10/2024
+
 name: Deploy to ECR repository
 
+# Trigger deployment on push to specified  branches
 on:
   push:
     branches:
-      - main
+      - main # On push to main branch
 
 jobs:
+  # DEPLOY INFRASTRUCTURE:
+  # Job to handle non-code-dependent CloudFormation deployments
   non-code-dependent-cloud-formation:
     runs-on: ubuntu-latest
     steps:
+      # Step to check out the repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step to configure AWS credentials for authentication
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Get AWS_ACCESS_KEY_ID form GitHub secrets
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Get AWS_SECRET_ACCESS_KEY form GitHub secrets
+          aws-region: ${{ vars.AWS_REGION }} # Get AWS_REGION form GitHub variables
 
+      # Step to validate CloudFormation templates before deploying
       - name: 'Validate CloudFormation templates'
         shell: bash
-        run: | 
-            aws cloudformation validate-template --template-body file://cloudformation/network.yml
-            aws cloudformation validate-template --template-body file://cloudformation/dynamodb.yml
-            aws cloudformation validate-template --template-body file://cloudformation/ecr.yml
-            aws cloudformation validate-template --template-body file://cloudformation/security-groups.yml
+        run: |
+          aws cloudformation validate-template --template-body file://cloudformation/network.yml
+          aws cloudformation validate-template --template-body file://cloudformation/dynamodb.yml
+          aws cloudformation validate-template --template-body file://cloudformation/ecr.yml
+          aws cloudformation validate-template --template-body file://cloudformation/security-groups.yml
 
+      # Step to deploy the validated CloudFormation templates for setting up infrastructure
+      # Stack Deploy Order:
+      # 1) network              | needs: NA
+      # 2) ecr                  | needs: NA
+      # 3) security-groups      | needs: ecr
+      # 4) dynamodb            | needs: NA
       - name: 'Deploy resources'
         shell: bash
         run: |
-            aws cloudformation deploy \
-              --template-file cloudformation/network.yml \
-              --stack-name network-stack \
-              --capabilities CAPABILITY_NAMED_IAM
-            
-            aws cloudformation deploy \
-              --template-file cloudformation/ecr.yml \
-              --stack-name ecr-stack \
-              --parameter-overrides \
-                LogReaderECRRepo=${{ vars.READER_ECR_REPO }} \
-                LogWriterECRRepo=${{ vars.WRITER_ECR_REPO }}
+          aws cloudformation deploy \
+            --template-file cloudformation/network.yml \
+            --stack-name network-stack \
+            --capabilities CAPABILITY_NAMED_IAM
           
-            aws cloudformation deploy \
-              --template-file cloudformation/security-groups.yml \
-              --stack-name security-groups-stack 
+          aws cloudformation deploy \
+            --template-file cloudformation/ecr.yml \
+            --stack-name ecr-stack \
+            --parameter-overrides \
+              LogReaderECRRepo=${{ vars.READER_ECR_REPO }} \
+              LogWriterECRRepo=${{ vars.WRITER_ECR_REPO }}
           
-            aws cloudformation deploy \
-              --template-file cloudformation/dynamodb.yml \
-              --stack-name dynamodb-stack
+          aws cloudformation deploy \
+            --template-file cloudformation/security-groups.yml \
+            --stack-name security-groups-stack 
+          
+          aws cloudformation deploy \
+            --template-file cloudformation/dynamodb.yml \
+            --stack-name dynamodb-stack
 
+  # DEPLOY FUNCTION IMAGES TO ECR:
+  # (build and push before deploying to ensure that the functions use the correct Docker Image)
+  # Job to deploy the Log Reader function's Docker image to ECR
   deploy-reader-function:
     runs-on: ubuntu-latest
     needs:
-      - non-code-dependent-cloud-formation
+      - non-code-dependent-cloud-formation # Wait for completion of non-code-dependent-cloud-formation deployment
     steps:
+      # Step to check out the repository code to provide access to the necessary files for building and deploying the Docker image.
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step to configure AWS credentials, allowing the job to authenticate and interact with AWS services.
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Get AWS_ACCESS_KEY_ID form GitHub secrets
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Get AWS_SECRET_ACCESS_KEY form GitHub secrets
+          aws-region: ${{ vars.AWS_REGION }} # Get AWS_REGION form GitHub variables
 
+      # Step to log in to Amazon ECR, enabling Docker commands to interact with the ECR repository for pushing the Docker image
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      # Step to log in to Amazon ECR, enabling Docker commands to interact with the ECR repository for pushing the Docker image
       - name: Build and Push Docker Image
         working-directory: ./reader
         shell: bash
@@ -76,29 +100,33 @@ jobs:
         run: |
           IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.READER_ECR_REPO }}:latest
 
-          # Build the Docker image
+          # Build the Docker image for the reader function
           echo "Building Docker image..."
           docker build -t $IMAGE_URI .
 
-          # Push the Docker image to ECR
+          # Push the Docker image to specified ECR repository
           echo "Pushing Docker image to $IMAGE_URI..."
           docker push $IMAGE_URI
 
-  deploy-write-function:
+  # Job to deploy the Log Writer function's Docker image to ECR
+  deploy-writer-function:
     runs-on: ubuntu-latest
     needs:
-       - non-code-dependent-cloud-formation
+      - non-code-dependent-cloud-formation # Wait for completion of non-code-dependent-cloud-formation deployment
     steps:
+      # Step to check out the repository code to provide access to the necessary files for building and deploying the Docker image
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step to configure AWS credentials, allowing the job to authenticate and interact with AWS services
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Get AWS_ACCESS_KEY_ID form GitHub secrets
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Get AWS_SECRET_ACCESS_KEY form GitHub secrets
+          aws-region: ${{ vars.AWS_REGION }} # Get AWS_REGION form GitHub variables
 
+      # Step to log in to Amazon ECR, enabling Docker commands to interact with the ECR repository for pushing the Docker image
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -110,62 +138,75 @@ jobs:
         run: |
           IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.WRITER_ECR_REPO }}:latest
 
-          # Build the Docker image
+          # Build the Docker image for the writer function
           echo "Building Docker image..."
           docker build -t $IMAGE_URI .
 
-          # Push the Docker image to ECR
+          # Push the Docker image to specified ECR repository
           echo "Pushing Docker image to $IMAGE_URI..."
           docker push $IMAGE_URI
 
+  # DEPLOY CODE DEPENDENT TEMPLATES:
+  # (deploy any templates that relay on the function images in th ECR)
+  # Job to deploy CloudFormation templates dependent on the code (e.g., Lambda functions)
   code-dependent-cloud-formation:
-      runs-on: ubuntu-latest
-      needs:
-        - deploy-write-function
-        - deploy-reader-function
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
-
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@v2
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ vars.AWS_REGION }}
-
-        - name: 'Validate CloudFormation templates'
-          shell: bash
-          run: |
-            aws cloudformation validate-template --template-body file://cloudformation/log-reader-lambda-function.yml
-            aws cloudformation validate-template --template-body file://cloudformation/log-writer-lambda-function.yml
-
-        - name: 'Deploy resources'
-          shell: bash
-          run: |
-            
-            aws cloudformation deploy \
-              --template-file cloudformation/log-reader-lambda-function.yml \
-              --stack-name log-reader-lambda-function-stack \
-              --capabilities CAPABILITY_NAMED_IAM \
-              --parameter-overrides \
-                FunctionName=${{ vars.READER_FUNCTION_NAME }}
-            
-            aws cloudformation deploy \
-              --template-file cloudformation/log-writer-lambda-function.yml \
-              --stack-name log-writer-lambda-function-stack \
-              --capabilities CAPABILITY_NAMED_IAM \
-              --parameter-overrides \
-                FunctionName=${{ vars.WRITER_FUNCTION_NAME }}
-
-  update-log-reader-lambda-function:
     runs-on: ubuntu-latest
     needs:
-      - code-dependent-cloud-formation
+      - deploy-writer-function # Wait for completion of writer function deployment
+      - deploy-reader-function # Wait for completion of reader function deployment
     steps:
+      # Step to check out the repository code, providing access to CloudFormation templates and other necessary files.
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step to configure AWS credentials, allowing the job to authenticate and interact with AWS services
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Get AWS_ACCESS_KEY_ID form GitHub secrets
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Get AWS_SECRET_ACCESS_KEY form GitHub secrets
+          aws-region: ${{ vars.AWS_REGION }} # Get AWS_REGION form GitHub variables
+
+      # Step to validate CloudFormation templates before deploying, ensuring that the syntax and structure of the templates are correct.
+      - name: 'Validate CloudFormation templates'
+        shell: bash
+        run: |
+          aws cloudformation validate-template --template-body file://cloudformation/log-reader-lambda-function.yml
+          aws cloudformation validate-template --template-body file://cloudformation/log-writer-lambda-function.yml
+
+      # Step to deploy CloudFormation stacks for both the reader and writer Lambda functions using the validated templates.
+      - name: 'Deploy resources'
+        shell: bash
+        run: |
+          aws cloudformation deploy \
+            --template-file cloudformation/log-reader-lambda-function.yml \
+            --stack-name log-reader-lambda-function-stack \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              FunctionName=${{ vars.READER_FUNCTION_NAME }}
+          
+          aws cloudformation deploy \
+            --template-file cloudformation/log-writer-lambda-function.yml \
+            --stack-name log-writer-lambda-function-stack \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              FunctionName=${{ vars.WRITER_FUNCTION_NAME }}
+      # Uses CAPABILITY_NAMED_IAM to allow the creation or modification of IAM roles required by the Lambda functions.
+      # Includes parameter overrides to specify the function names for each deployment.
+
+  # UPDATE LAMBDA FUNCTION TO LATEST IMAGES IN ECR:
+  # (changes to functions cna be applied without modifying the cloud formation template)
+  # Job to update the Log Reader Lambda function with the latest Docker image
+  update-log-reader-lambda-function:
+    runs-on: ubuntu-latest
+    needs:
+      - code-dependent-cloud-formation # Wait for completion of code-dependent-cloud-formation deployment
+    steps:
+      # Step to check out the repository code, providing access to any files needed for the update.
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step to configure AWS credentials for authenticating API calls to AWS services.
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -173,27 +214,32 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      # Step to log in to Amazon Elastic Container Registry (ECR) to push or pull Docker images.
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      # Step to update the specified Lambda function with the latest Docker image from ECR.
       - name: Update lambda function
         shell: bash
         run: |
           IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.READER_ECR_REPO }}:latest
           
+          # Update the Lambda function with the latest Docker image
           echo "Updating Lambda function ${{ vars.READER_FUNCTION_NAME }} with image $IMAGE_URI..."
           aws lambda update-function-code --function-name ${{ vars.READER_FUNCTION_NAME }} --image-uri $IMAGE_URI
 
-
+  # Job to update the Log Writer Lambda function with the latest Docker image
   update-log-writer-lambda-function:
     runs-on: ubuntu-latest
     needs:
-      - code-dependent-cloud-formation
+      - code-dependent-cloud-formation # Wait for completion of code-dependent-cloud-formation deployment
     steps:
+      # Step to check out the repository code, providing access to any files needed for the update.
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step to configure AWS credentials for authenticating API calls to AWS services.
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -201,16 +247,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      # Step to log in to Amazon Elastic Container Registry (ECR) to push or pull Docker images.
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      # Step to update the specified Lambda function with the latest Docker image from ECR.
       - name: Update lambda function
         shell: bash
         run: |
           IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ vars.WRITER_ECR_REPO }}:latest
 
+          # Update the Lambda function with the latest Docker image
           echo "Updating Lambda function ${{ vars.WRITER_FUNCTION_NAME }} with image $IMAGE_URI..."
           aws lambda update-function-code --function-name ${{ vars.WRITER_FUNCTION_NAME }} --image-uri $IMAGE_URI
-
-
+      # The image URI is constructed using the ECR registry and repository name defined in the variables.
+#____________________....oooOO0_END_OF_FILE_0OOooo....____________________
