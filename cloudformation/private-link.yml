@@ -14,8 +14,5 @@ Resources:
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
       VpcId: !ImportValue VPCId
       VpcEndpointType: Gateway
-      SecurityGroupIds:
-        - !ImportValue LambdaSecurityGroupId
-      SubnetIds: # Replace with your private subnets
-        - !ImportValue PrivateSubnetAId
-        - !ImportValue PrivateSubnetBId
+      RouteTableIds:
+        - !ImportValue PrivateRouteTableId
