@@ -51,6 +51,8 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
             body: JSON.stringify(top100LogEventRecords),
         };
     } catch (error) {
+
+        console.log(error);
         // Handle errors during processing and send generic error response to client
         return {
             statusCode: 500, // Generic error response
