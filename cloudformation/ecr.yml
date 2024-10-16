@@ -1,36 +1,55 @@
+# AUTHOR: Ethan Schoonbee
+# EMAIL: schoonbeeethan@gmail.com
+# DATE CREATED: 15/10/2024
+# LAST MODIFIED: 16/10/2024
+
+# AWS CloudFormation template version
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation template to configure API route /hello-world'
 
 Parameters:
+  # Parameter to specify the name of the ECR repository for the log-reader Lambda function
   LogReaderECRRepo:
     Type: String
+
+  # Parameter to specify the name of the ECR repository for the log-writer Lambda function
   LogWriterECRRepo:
     Type: String
 
 Resources:
+  # Creates an ECR repository for storing Docker images for the log-reader Lambda function
   LogReaderLambdaECRRepository:
     Type: 'AWS::ECR::Repository'
     Properties:
+      # Uses the provided repository name for the log-reader function
       RepositoryName: !Ref LogReaderECRRepo
+      # Enables automatic scanning of images for security vulnerabilities when they are pushed
       ImageScanningConfiguration:
         ScanOnPush: true
 
+  # Creates an ECR repository for storing Docker images for the log-writer Lambda function
   LogWriterLambdaECRRepository:
     Type: 'AWS::ECR::Repository'
     Properties:
+      # Uses the provided repository name for the log-writer function
       RepositoryName: !Ref LogWriterECRRepo
+      # Enables automatic scanning of images for security vulnerabilities when they are pushed
       ImageScanningConfiguration:
         ScanOnPush: true
 
+# Resources to export and make available for use in other CloudFormation stacks
 Outputs:
+  # Output the URI of the log-reader Lambda function's ECR repository, allowing access to the repository's images
   LogReaderLambdaECRRepositoryUri:
     Description: 'URI of the log-reader-lambda function ECR repository'
     Value: !GetAtt LogReaderLambdaECRRepository.RepositoryUri
     Export:
       Name: 'LogReaderLambdaECRRepositoryUri'
 
+  # Output the URI of the log-writer Lambda function's ECR repository, allowing access to the repository's images
   LogWriterLambdaECRRepositoryUri:
     Description: 'URI of the log-writer-lambda function ECR repository'
     Value: !GetAtt LogWriterLambdaECRRepository.RepositoryUri
     Export:
       Name: 'LogWriterLambdaECRRepositoryUri'
+#____________________....oooOO0_END_OF_FILE_0OOooo....____________________

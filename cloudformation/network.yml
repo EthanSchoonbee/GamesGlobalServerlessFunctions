@@ -1,17 +1,25 @@
+# AUTHOR: Ethan Schoonbee
+# EMAIL: schoonbeeethan@gmail.com
+# DATE CREATED: 15/10/2024
+# LAST MODIFIED: 16/10/2024
+
+# AWS CloudFormation template version
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation template to create a new VPC with essential components'
 
 Resources:
+  # Create a new Virtual Private Cloud (VPC)
   VPC:
     Type: 'AWS::EC2::VPC'
     Properties:
-      CidrBlock: '10.0.0.0/16'
-      EnableDnsSupport: true
-      EnableDnsHostnames: true
+      CidrBlock: '10.0.0.0/16'               # CIDR block for the VPC
+      EnableDnsSupport: true                  # Enable DNS support for the VPC
+      EnableDnsHostnames: true                # Enable DNS hostnames for instances in the VPC
       Tags:
         - Key: 'Name'
           Value: 'vpc'
 
+  # Create an Internet Gateway for the VPC
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
     Properties:
@@ -19,140 +27,161 @@ Resources:
         - Key: 'Name'
           Value: 'internet-gateway'
 
+  # Attach the Internet Gateway to the VPC
   AttachGateway:
     Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
-      VpcId: !Ref VPC
-      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC                        # Reference to the created VPC
+      InternetGatewayId: !Ref InternetGateway # Reference to the created Internet Gateway
 
+  # Create Public Subnet A
   PublicSubnetA:
     Type: 'AWS::EC2::Subnet'
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: '10.0.1.0/24'
-      MapPublicIpOnLaunch: true
-      AvailabilityZone: !Sub '${AWS::Region}a'
+      VpcId: !Ref VPC                        # Reference to the created VPC
+      CidrBlock: '10.0.1.0/24'               # CIDR block for Public Subnet A
+      MapPublicIpOnLaunch: true              # Enable public IP assignment on instance launch
+      AvailabilityZone: !Sub '${AWS::Region}a' # Place in availability zone A
       Tags:
         - Key: 'Name'
           Value: 'public-subnet-a'
 
+  # Create Public Subnet B
   PublicSubnetB:
     Type: 'AWS::EC2::Subnet'
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: '10.0.2.0/24'
-      MapPublicIpOnLaunch: true
-      AvailabilityZone: !Sub '${AWS::Region}b'
+      VpcId: !Ref VPC                        # Reference to the created VPC
+      CidrBlock: '10.0.2.0/24'               # CIDR block for Public Subnet B
+      MapPublicIpOnLaunch: true              # Enable public IP assignment on instance launch
+      AvailabilityZone: !Sub '${AWS::Region}b' # Place in availability zone B
       Tags:
         - Key: 'Name'
           Value: 'public-subnet-b'
 
+  # Create Private Subnet A
   PrivateSubnetA:
     Type: 'AWS::EC2::Subnet'
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: '10.0.3.0/24'
-      AvailabilityZone: !Sub '${AWS::Region}a'
+      VpcId: !Ref VPC                        # Reference to the created VPC
+      CidrBlock: '10.0.3.0/24'               # CIDR block for Private Subnet A
+      AvailabilityZone: !Sub '${AWS::Region}a' # Place in availability zone A
       Tags:
         - Key: 'Name'
           Value: 'private-subnet-a'
 
+  # Create Private Subnet B
   PrivateSubnetB:
     Type: 'AWS::EC2::Subnet'
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: '10.0.4.0/24'
-      AvailabilityZone: !Sub '${AWS::Region}b'
+      VpcId: !Ref VPC                        # Reference to the created VPC
+      CidrBlock: '10.0.4.0/24'               # CIDR block for Private Subnet B
+      AvailabilityZone: !Sub '${AWS::Region}b' # Place in availability zone B
       Tags:
         - Key: 'Name'
           Value: 'private-subnet-b'
 
+  # Create a Route Table for public subnets
   PublicRouteTable:
     Type: 'AWS::EC2::RouteTable'
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref VPC                        # Reference to the created VPC
       Tags:
         - Key: 'Name'
           Value: 'public-route-table'
 
+  # Create a route to the Internet via the Internet Gateway
   PublicRoute:
     Type: 'AWS::EC2::Route'
     Properties:
-      RouteTableId: !Ref PublicRouteTable
-      DestinationCidrBlock: '0.0.0.0/0'
-      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicRouteTable   # Reference to the public route table
+      DestinationCidrBlock: '0.0.0.0/0'      # Allow all outbound traffic
+      GatewayId: !Ref InternetGateway         # Reference to the attached Internet Gateway
 
+  # Associate Public Subnet A with the Public Route Table
   PublicSubnetARouteTableAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref PublicSubnetA
-      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetA           # Reference to Public Subnet A
+      RouteTableId: !Ref PublicRouteTable     # Reference to the public route table
 
+  # Associate Public Subnet B with the Public Route Table
   PublicSubnetBRouteTableAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref PublicSubnetB
-      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetB           # Reference to Public Subnet B
+      RouteTableId: !Ref PublicRouteTable     # Reference to the public route table
 
+  # Create a Route Table for private subnets
   PrivateRouteTable:
     Type: 'AWS::EC2::RouteTable'
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref VPC                        # Reference to the created VPC
       Tags:
         - Key: 'Name'
           Value: 'private-route-table'
 
+  # Associate Private Subnet A with the Private Route Table
   PrivateSubnetARouteTableAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref PrivateSubnetA
-      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetA          # Reference to Private Subnet A
+      RouteTableId: !Ref PrivateRouteTable    # Reference to the private route table
 
+  # Associate Private Subnet B with the Private Route Table
   PrivateSubnetBRouteTableAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref PrivateSubnetB
-      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetB          # Reference to Private Subnet B
+      RouteTableId: !Ref PrivateRouteTable    # Reference to the private route table
 
+# Resources to export and make available for use in other CloudFormation stacks
 Outputs:
+  # Output the ID of the created VPC
   VPCId:
     Description: 'VPC ID'
-    Value: !Ref VPC
+    Value: !Ref VPC                          # Reference to the created VPC
     Export:
       Name: 'VPCId'
 
+  # Output the ID of Public Subnet A
   PublicSubnetAId:
     Description: 'Public subnet A identifier'
-    Value: !Ref PublicSubnetA
+    Value: !Ref PublicSubnetA                # Reference to Public Subnet A
     Export:
       Name: 'PublicSubnetAId'
 
+  # Output the ID of Public Subnet B
   PublicSubnetBId:
     Description: 'Public subnet B identifier'
-    Value: !Ref PublicSubnetB
+    Value: !Ref PublicSubnetB                # Reference to Public Subnet B
     Export:
       Name: 'PublicSubnetBId'
 
+  # Output the ID of Private Subnet A
   PrivateSubnetAId:
     Description: 'Private subnet A identifier'
-    Value: !Ref PrivateSubnetA
+    Value: !Ref PrivateSubnetA               # Reference to Private Subnet A
     Export:
       Name: 'PrivateSubnetAId'
 
+  # Output the ID of Private Subnet B
   PrivateSubnetBId:
     Description: 'Private subnet B identifier'
-    Value: !Ref PrivateSubnetB
+    Value: !Ref PrivateSubnetB               # Reference to Private Subnet B
     Export:
       Name: 'PrivateSubnetBId'
 
+  # Output the ID of the Internet Gateway
   InternetGatewayId:
     Description: 'Internet gateway identifier'
-    Value: !Ref InternetGateway
+    Value: !Ref InternetGateway              # Reference to the created Internet Gateway
     Export:
       Name: 'InternetGatewayId'
 
+  # Output the ID of the Private Route Table
   PrivateRouteTableId:
     Description: 'Private route table Identifier'
-    Value: !Ref PrivateRouteTable
+    Value: !Ref PrivateRouteTable            # Reference to the created Private Route Table
     Export:
       Name: 'PrivateRouteTableId'
+#____________________....oooOO0_END_OF_FILE_0OOooo....____________________

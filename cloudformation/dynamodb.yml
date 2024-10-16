@@ -1,26 +1,36 @@
+# AUTHOR: Ethan Schoonbee
+# EMAIL: schoonbeeethan@gmail.com
+# DATE CREATED: 15/10/2024
+# LAST MODIFIED: 16/10/2024
+
+# AWS CloudFormation template version
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation template to configure DynamoDB'
 
 Resources:
+  # Creates a DynamoDB table named 'log-events'
   LogEventTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: 'log-events'
+      TableName: 'log-events' # Specify the name of the table
       KeySchema:
-        - AttributeName: Id
-          KeyType: HASH
-      BillingMode: 'PAY_PER_REQUEST'
+        - AttributeName: Id   # Define the partition key attribute (Id)
+          KeyType: HASH       # Specify 'Id' as the partition key (HASH)
+      BillingMode: 'PAY_PER_REQUEST' # Uses on-demand pricing for read/write requests
       StreamSpecification:
-        StreamViewType: 'NEW_AND_OLD_IMAGES'
+        StreamViewType: 'NEW_AND_OLD_IMAGES' # Enable streams to capture both new and old images of modified items
       AttributeDefinitions:
-        - AttributeName: Id
-          AttributeType: S
+        - AttributeName: Id   # Define the 'Id' attribute
+          AttributeType: S    # Specify the 'Id' attribute type as a string (S)
       SSESpecification:
-        SSEEnabled: true
+        SSEEnabled: true      # Enable server-side encryption for the table
 
+# Resources to export and make available for use in other CloudFormation stacks
 Outputs:
+  # Output the ARN (Amazon Resource Name) of the DynamoDB table
   LogEventTableArn:
     Description: 'ARN of LogEvent table'
     Value: !GetAtt LogEventTable.Arn
     Export:
       Name: 'LogEventTableArn'
+#____________________....oooOO0_END_OF_FILE_0OOooo....____________________

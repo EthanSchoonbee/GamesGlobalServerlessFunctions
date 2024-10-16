@@ -1,20 +1,29 @@
+# AUTHOR: Ethan Schoonbee
+# EMAIL: schoonbeeethan@gmail.com
+# DATE CREATED: 15/10/2024
+# LAST MODIFIED: 16/10/2024
+
+# AWS CloudFormation template version
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation template to configure log writer function'
 
 Parameters:
+  # Parameter to specify the Lambda function's name
   FunctionName:
     Type: String
 
 Resources:
+  # IAM Role for the Lambda function to grant necessary permissions
   LambdaExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
+      # Policy document that allows the Lambda function to assume this role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: 'Allow'
             Principal:
-              Service: 'lambda.amazonaws.com'
+              Service: 'lambda.amazonaws.com' # Allow Lambda service to assume the role
             Action: 'sts:AssumeRole'
       Policies:
         - PolicyName: 'LambdaExecution'
@@ -22,12 +31,14 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: 'Allow'
+                # Permissions for logging to CloudWatch Logs
                 Action:
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
-                Resource: "*"
+                Resource: "*" # Allow logging to any CloudWatch resource
               - Effect: 'Allow'
+                # Permissions to perform various operations on the DynamoDB table
                 Action:
                   - 'dynamodb:PutItem'
                   - 'dynamodb:GetItem'
@@ -36,59 +47,68 @@ Resources:
                   - 'dynamodb:Query'
                   - 'dynamodb:Scan'
                 Resource: !Sub
-                  - '${logEventTableArn}*'
+                  - '${logEventTableArn}*' # Use the imported DynamoDB table ARN
                   - logEventTableArn: !ImportValue LogEventTableArn
+      # Attach a managed policy for Lambda's VPC access
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
 
+  # Define the Lambda function resource
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: !Ref FunctionName
-      Role: !GetAtt LambdaExecutionRole.Arn
-      PackageType: 'Image'
+      FunctionName: !Ref FunctionName # Set the function's name
+      Role: !GetAtt LambdaExecutionRole.Arn # Specify the IAM role for the function
+      PackageType: 'Image' # Indicate the Lambda function is deployed using a container image
       Code:
         ImageUri: !Sub
-          - "${ecrRepositoryUri}:latest"
+          - "${ecrRepositoryUri}:latest" # Use the latest image from the specified ECR repository
           - ecrRepositoryUri: !ImportValue LogWriterLambdaECRRepositoryUri
-      Timeout: 15
-      MemorySize: 128
+      Timeout: 15 # Set the maximum execution time of the Lambda function to 15 seconds
+      MemorySize: 128 # Allocate 128 MB of memory for the function
       VpcConfig:
         SecurityGroupIds:
-          - !ImportValue LambdaSecurityGroupId
+          - !ImportValue LambdaSecurityGroupId # Specify the security group for VPC access
         SubnetIds:
-          - !ImportValue PrivateSubnetAId
-          - !ImportValue PrivateSubnetBId
+          - !ImportValue PrivateSubnetAId # Specify private subnet A for Lambda function
+          - !ImportValue PrivateSubnetBId # Specify private subnet B for Lambda function
 
+  # Define a public URL for the Lambda function, allowing direct HTTP access
   LambdaFunctionUrl:
     Type: 'AWS::Lambda::Url'
     Properties:
-      AuthType: NONE
-      TargetFunctionArn: !Ref LambdaFunction
+      AuthType: NONE # Disable authentication for accessing the URL
+      TargetFunctionArn: !Ref LambdaFunction # Link the URL to the specified Lambda function
 
+  # Grant permissions to invoke the Lambda function through its URL
   LambdaFunctionUrlPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      Action: lambda:InvokeFunctionUrl
-      Principal: '*'
+      Action: lambda:InvokeFunctionUrl # Allow invoking the function via its URL
+      Principal: '*' # Grant access to all users
       FunctionName: !Ref LambdaFunction
-      FunctionUrlAuthType: NONE
+      FunctionUrlAuthType: NONE # Disable authentication for invoking the URL
 
+# Resources to export and make available for use in other CloudFormation stacks
 Outputs:
+  # Output the name of the Lambda function for use in other templates or resources
   LambdaFunctionName:
     Description: 'The name of the Lambda function'
     Value: !Ref LambdaFunction
     Export:
       Name: 'LogWriterLambdaFunctionName'
 
+  # Output the ARN of the Lambda function for cross-template reference
   LambdaFunctionArn:
     Description: 'The ARN of the Lambda function'
     Value: !GetAtt LambdaFunction.Arn
     Export:
       Name: 'LogWriterLambdaFunctionArn'
 
+  # Outputs the URL of the Lambda function for direct access
   LambdaFunctionUrl:
     Description: 'The URL of the Lambda function'
     Value: !GetAtt LambdaFunctionUrl.FunctionUrl
     Export:
       Name: 'LogWriterLambdaFunctionUrl'
+#____________________....oooOO0_END_OF_FILE_0OOooo....____________________

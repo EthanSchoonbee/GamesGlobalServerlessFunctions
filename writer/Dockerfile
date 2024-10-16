@@ -1,7 +1,7 @@
 #AUTHOR: Ethan Schoonbee
 #EMAIL: schoonbeeethan@gmail.com
 #DATE CREATED: 15/10/2024
-#LAST MODIFIED: 15/10/2024
+#LAST MODIFIED: 16/10/2024
 
 # Use the official Node.js 20 Alpine image as the base for the build stage
 FROM node:20-alpine as build
