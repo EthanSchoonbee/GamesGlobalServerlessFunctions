@@ -9,8 +9,8 @@ name: Deploy to ECR repository
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main # On push to main branch
+  workflow_dispatch: # Setup manual pipeline run trigger
     inputs:
       trigger:
         description: 'Manually trigger the deployment workflow'

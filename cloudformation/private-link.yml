@@ -8,11 +8,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation template to provision a Security Group for AWS Lambda functions.'
 
 Resources:
+  # Define a VPC Endpoint for DynamoDB, enabling private communication between the VPC and DynamoDB
   DynamoDBVpcEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
+      # The service name for the DynamoDB endpoint, automatically set based on the region
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
+      # Reference to the VPC where the VPC Endpoint will be created
       VpcId: !ImportValue VPCId
+      # The type of VPC Endpoint being created, set to 'Gateway' for communication with DynamoDB
       VpcEndpointType: Gateway
+      # List of route tables to associate with this VPC Endpoint, ensuring traffic routing
       RouteTableIds:
         - !ImportValue PrivateRouteTableId
+#____________________....oooOO0_END_OF_FILE_0OOooo....____________________
