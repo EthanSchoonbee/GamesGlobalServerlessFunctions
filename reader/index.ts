@@ -3,20 +3,31 @@ AUTHOR: Ethan Schoonbee
 EMAIL: schoonbeeethan@gmail.com
 DATE CREATED: 15/10/2024
 LAST MODIFIED: 16/10/2024
- */
+DESCRIPTION:
+    This AWS Lambda function retrieves the latest 100 log entries from a DynamoDB table named 'log-events'.
+    It ensures that only GET requests are processed and sorts the logs in descending order based on the 'DateTime' field.
+    The logs are fetched using the AWS SDK for DynamoDB, and the function returns the sorted records as a JSON response.
+*/
 
 import * as AWS from 'aws-sdk';
 import {APIGatewayProxyEventV2} from 'aws-lambda';
 import {APIGatewayProxyStructuredResultV2} from "aws-lambda/trigger/api-gateway-proxy";
-import {copyFileSync} from "node:fs";
 
 // Create a new instance of DynamoDB DocumentClient to interact with DynamoDB
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
-// Lambda function handler for fetching TOP 100 logs in descending order of DateTime
+/**
+ * Lambda function handler to fetch the top 100 log entries from DynamoDB.
+ * Accepts only GET requests and retrieves logs in descending order of their DateTime attribute.
+ *
+ * @param {APIGatewayProxyEventV2} event - The API Gateway event containing request details.
+ * @returns {Promise<APIGatewayProxyStructuredResultV2>} - A promise that resolves to the API Gateway response.
+ */
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> => {
     try {
+
         console.log(event);
+
         // Validate HTTP method to only allow  GET requests
         if (event.requestContext.http.method !== 'GET') {
             return {
@@ -27,14 +38,13 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
         }
 
         // Define parameters for the DynamoDB scan operation
-        // Specify the table name from which to fetch records
         const queryParameters = {
-            TableName: 'log-events'
+            TableName: 'log-events' // Table name to fetch log entries from
         };
 
         console.log(queryParameters);
 
-        // Fetch All DynamoDB log records using 'promise' to ensure an asynchronous call
+        // Fetch All DynamoDB log records using a 'promise' to ensure an asynchronous call
         const result = await dynamoDB.scan(queryParameters).promise();
 
         console.log(result);
@@ -51,18 +61,26 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 
         // Send success response to client with the sorted and filtered list in JSON format
         return {
-            statusCode: 200, // Success with response
+            statusCode: 200, // Successful response
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(top100LogEventRecords),
+            body: JSON.stringify(top100LogEventRecords), // Convert JS object to JSON
         };
     } catch (error) {
+        // Narrowing the type of error to check if it's an instance of Error
+        if (error instanceof Error) {
+            console.log(error.message);
+            return {
+                statusCode: 500,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: error.message })
+            };
+        }
 
-        console.log(error);
-        // Handle errors during processing and send generic error response to client
+        // Handle cases where the error is not an instance of Error
         return {
-            statusCode: 500, // Generic error response
+            statusCode: 500,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: 'Failed to fetch log records. Please try again later.' })
+            body: JSON.stringify({ message: 'An unexpected error occurred while retrieving log entries' })
         };
     }
 };
