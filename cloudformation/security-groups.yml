@@ -22,6 +22,7 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: "0.0.0.0/0"
+      # Allows outbound TCP traffic on all ports from any IP address
       SecurityGroupEgress:
         - IpProtocol: -1
           FromPort: 0

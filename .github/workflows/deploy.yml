@@ -9,7 +9,13 @@ name: Deploy to ECR repository
 on:
   push:
     branches:
-      - main # On push to main branch
+      - main
+  workflow_dispatch:
+    inputs:
+      trigger:
+        description: 'Manually trigger the deployment workflow'
+        required: false
+        default: 'Deploy'
 
 jobs:
   # DEPLOY INFRASTRUCTURE:
@@ -44,7 +50,8 @@ jobs:
       # 1) network              | needs: NA
       # 2) ecr                  | needs: NA
       # 3) security-groups      | needs: ecr
-      # 4) dynamodb            | needs: NA
+      # 4) private-link         | needs: security-groups
+      # 4) dynamodb             | needs: NA
       - name: 'Deploy resources'
         shell: bash
         run: |
