@@ -37,6 +37,7 @@ jobs:
           aws cloudformation validate-template --template-body file://cloudformation/dynamodb.yml
           aws cloudformation validate-template --template-body file://cloudformation/ecr.yml
           aws cloudformation validate-template --template-body file://cloudformation/security-groups.yml
+          aws cloudformation validate-template --template-body file://cloudformation/private-link.yml
 
       # Step to deploy the validated CloudFormation templates for setting up infrastructure
       # Stack Deploy Order:
@@ -62,6 +63,10 @@ jobs:
           aws cloudformation deploy \
             --template-file cloudformation/security-groups.yml \
             --stack-name security-groups-stack 
+          
+          aws cloudformation deploy \
+            --template-file cloudformation/private-link.yml \
+            --stack-name private-link-stack
           
           aws cloudformation deploy \
             --template-file cloudformation/dynamodb.yml \

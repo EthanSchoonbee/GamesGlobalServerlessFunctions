@@ -1,0 +1,21 @@
+# AUTHOR: Ethan Schoonbee
+# EMAIL: schoonbeeethan@gmail.com
+# DATE CREATED: 15/10/2024
+# LAST MODIFIED: 16/10/2024
+
+# Specifies the AWS CloudFormation template version
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template to provision a Security Group for AWS Lambda functions.'
+
+Resources:
+  DynamoDBVpcEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
+      VpcId: !ImportValue VPCId
+      VpcEndpointType: Interface
+      SecurityGroupIds:
+        - !ImportValue LambdaSecurityGroup
+      SubnetIds: # Replace with your private subnets
+        - !ImportValue PrivateSubnet1
+        - !ImportValue PrivateSubnet2
