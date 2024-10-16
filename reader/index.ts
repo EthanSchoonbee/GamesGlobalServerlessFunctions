@@ -8,14 +8,15 @@ LAST MODIFIED: 16/10/2024
 import * as AWS from 'aws-sdk';
 import {APIGatewayProxyEventV2} from 'aws-lambda';
 import {APIGatewayProxyStructuredResultV2} from "aws-lambda/trigger/api-gateway-proxy";
+import {copyFileSync} from "node:fs";
 
 // Create a new instance of DynamoDB DocumentClient to interact with DynamoDB
-// Specify the AWS region where  the DynamoDB table is located
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
 // Lambda function handler for fetching TOP 100 logs in descending order of DateTime
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> => {
     try {
+        console.log(event);
         // Validate HTTP method to only allow  GET requests
         if (event.requestContext.http.method !== 'GET') {
             return {
@@ -31,8 +32,12 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
             TableName: 'log-events'
         };
 
+        console.log(queryParameters);
+
         // Fetch All DynamoDB log records using 'promise' to ensure an asynchronous call
         const result = await dynamoDB.scan(queryParameters).promise();
+
+        console.log(result);
 
         // Fetch log records from the 'Items' property of the result
         // Fallback on an empty array if no items are retrieved
