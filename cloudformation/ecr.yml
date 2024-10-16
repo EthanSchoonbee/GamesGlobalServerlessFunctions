@@ -5,7 +5,9 @@
 
 # AWS CloudFormation template version
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template to configure API route /hello-world'
+Description: |
+  CloudFormation template for creating ECR repositories to store Docker images for 
+  log-reader and log-writer Lambda functions with image scanning enabled.
 
 Parameters:
   # Parameter to specify the name of the ECR repository for the log-reader Lambda function

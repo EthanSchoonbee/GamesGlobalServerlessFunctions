@@ -5,7 +5,7 @@
 
 # Specifies the AWS CloudFormation template version
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template to create a new VPC with essential components'
+Description: 'CloudFormation template to provision a Security Group for AWS Lambda functions.'
 
 Resources:
   # Creates a Security Group for Lambda functions to control network traffic
