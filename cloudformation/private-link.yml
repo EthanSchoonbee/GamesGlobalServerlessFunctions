@@ -15,7 +15,7 @@ Resources:
       VpcId: !ImportValue VPCId
       VpcEndpointType: Interface
       SecurityGroupIds:
-        - !ImportValue LambdaSecurityGroup
+        - !ImportValue LambdaSecurityGroupId
       SubnetIds: # Replace with your private subnets
         - !ImportValue PrivateSubnetAId
         - !ImportValue PrivateSubnetBId
