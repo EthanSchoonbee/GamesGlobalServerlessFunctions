@@ -2,6 +2,14 @@
 <br />
 <br />
 
+<p align="center">
+  <img src="assets/main-logo.png" />
+</p>
+<br />
+<br />
+
+---
+
 # Author Details:
 
 **Full Name** - *Ethan Schoonbee*
@@ -15,6 +23,8 @@
 **Email** - *schoonbeeethan@gmail.com*
 <br />
 <br />
+
+---
 
 # Table of Contents:
 - [Introduction](#introduction)
