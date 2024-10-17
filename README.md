@@ -117,12 +117,12 @@ To deploy the serverless functions to AWS, follow these steps:
 
 ### 7. Create Access Key
 
-#### Naviagte back to the '*Users* ' page and you should see the new user that you created. Click the users name in blue.
+#### Navigate back to the '*Users* ' page and you should see the new user that you created. Click the user's name in blue.
 <p align="center">
   <img src="assets/IAM_CREATE_USER_4.jpg" />
 </p>
 
-#### These are your users settings. In the navigation bar located below the '*Summary* ' select the *'Security credentials* ' section.
+#### These are your users' settings. In the navigation bar located below the '*Summary* ' select the *'Security credentials* ' section.
 <p align="center">
   <img src="assets/IAM_CREATE_USER_10.jpg" />
 </p>
@@ -138,29 +138,29 @@ To deploy the serverless functions to AWS, follow these steps:
   <img src="assets/IAM_CREATE_USER_12.jpg" />
 </p>
 
-#### You can add a description to this key if you would like but you are more than welcome to skip aswell it wont affect anything.
+#### You can add a description to this key if you would like but you are more than welcome to skip it as well it won't affect anything.
 <p align="center">
   <img src="assets/IAM_CREATE_USER_13.jpg" />
 </p>
 
-#### Your Access Key has now ben created! Copy the "*Access key* ' and '*Secrect access key* ' and keep them safe as we will use them next.
+#### Your Access Key has now been created! Copy the "*Access key* ' and '*Secret access key* ' and keep them safe as we will use them next.
 <p align="center">
   <img src="assets/IAM_CREATE_USER_14.jpg" />
 </p>
 
 ### 8. Fork the Repository
 
-#### Navigate to the top of this GitHub repsoitory and press the '*Fork* ' button located in the top right between '*Watch* ' and '*Star* '.
+#### Navigate to the top of this GitHub repository and press the '*Fork* ' button located in the top right between '*Watch* ' and '*Star* '.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_1.jpg" />
 </p>
 
-#### Create a '*Fork* ' of my repository on your account. Youre welcome to reaname it and add your own description :)
+#### Create a '*Fork* ' of my repository on your account. You are welcome to rename it and add your own description :)
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_2.jpg" />
 </p>
 
-#### This will create a forked repository on your GitHub account with all my code. We will be working in this forked repository from now on.
+#### This will create a forked repository on your GitHub account with all my code. We will be working on this forked repository from now on.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_4.jpg" />
 </p>
@@ -173,14 +173,14 @@ To deploy the serverless functions to AWS, follow these steps:
   <img src="assets/GITHUB_DEPLOYMENT_3.jpg" />
 </p>
 
-### 9. Add Secrets and Variables for GitHub Actiosn Pipeline
+### 9. Add Secrets and Variables for GitHub Actions Pipeline
 
 #### Within your forked repository at the very top you will see a navigation bar. Press the '*Settings* ' option on the far right.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_6.jpg" />
 </p>
 
-#### In your repository settings page you will see a menu to the left side. Locate and press the '*Secrets and variabels* ' option under '*Security* '.
+#### In your repository settings page you will see a menu to the left side. Locate and press the '*Secrets and variables* ' option under '*Security* '.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_7.jpg" />
 </p>
@@ -197,13 +197,13 @@ To deploy the serverless functions to AWS, follow these steps:
 </p>
 
 #### You need to create a secret called '*AWS_ACCESS_KEY_ID* ' and paste in the Access Key for our IAM user we created (remember the secrets I told you to keep safe).
-#### It will look something like this : **XZPMA1BCY9WQDLGT3JHK**  
+#### It will look something like this: **XZPMA1BCY9WQDLGT3JHK**  
 *NOTE THAT THIS IS NOT A REAL ACCESS KEY*
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_10.jpg" />
 </p>
 
-#### You will also create another secret called '*AWS_SECRET_ACCESS_KEY* ' and paste in the Secret Access Key i also told you to keep safe.
+#### You will also create another secret called '*AWS_SECRET_ACCESS_KEY* ' and paste into the Secret Access Key I also told you to keep safe.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_11.jpg" />
 </p>
@@ -219,14 +219,14 @@ To deploy the serverless functions to AWS, follow these steps:
   <img src="assets/GITHUB_DEPLOYMENT_13.jpg" />
 </p>
 
-#### You need to create a variable called '*AWS_REGION* ' which will hold your selected region for AWS. I use '*us-east-1* ' as my defualt.
+#### You need to create a variable called '*AWS_REGION* ' which will hold your selected region for AWS. I use '*us-east-1* ' as my default.
 #### If you are unsure you can use the same region as me.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_14.jpg" />
 </p>
 
 #### Add variables called '*READER_ECR_REPO* ' & '*WRITER_ECR_REPO* ' that will hold the names of your ECR repositories for the reader and writer lambda functions.
-#### You can name these anything as long as there are no other repositories with the same name in the ECR of your chosen region.
+#### You can name anything as long as there are no other repositories with the same name in the ECR of your chosen region.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_15.jpg" />
 </p>
@@ -235,7 +235,7 @@ To deploy the serverless functions to AWS, follow these steps:
   <img src="assets/GITHUB_DEPLOYMENT_16.jpg" />
 </p>
 
-#### Add variables called '*READER_FUNCTION_NAME* ' & '*WRITER_FUNCTION_NAME* ' that will hold the names of your reader and writer lambda function respectivly.
+#### Add variables called '*READER_FUNCTION_NAME* ' & '*WRITER_FUNCTION_NAME* ' that will hold the names of your reader and writer lambda function respectively.
 #### Once again you can name these anything as long as there are no other lambda functions with the same name in your chosen region.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_17.jpg" />
@@ -257,12 +257,74 @@ To deploy the serverless functions to AWS, follow these steps:
   <img src="assets/GITHUB_DEPLOYMENT_6.jpg" />
 </p>
 
-#### This will open up your GitHub Actions page where all your pipline workflows are held.
-#### On the left hand side you will see a menu listing the currently avaliable workflows.
+#### This will open up your GitHub Actions page where all your pipeline workflows are held.
+#### On the left-hand side you will see a menu listing the currently available workflows.
 #### Locate the workflow called '*Deploy log lambdas to AWS* ' and click it.
 <p align="center">
-  <img src="assets/GITHUB_DEPLOYMENT_6.jpg" />
+  <img src="assets/GITHUB_DEPLOYMENT_20.jpg" />
 </p>
+
+#### To the right you will see the workflows that have run already.
+#### There may be a failed workflow already. Don't worry this is because we didn't have your Secrets and Variables.
+#### On the right side there is a grey button called '*Run workflows* ' click it.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_21.jpg" />
+</p>
+
+#### A popup will appear. Click the green '*Run workflows* ' button.
+#### This will start your deployment to your AWS account.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_22.jpg" />
+</p>
+
+#### A new workflow will appear on your page (you may need to refresh) and will appear orange as it works away.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_23.jpg" />
+</p>
+
+#### If you click on that new workflow you can see each job that is completed one by one.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_24.jpg" />
+</p>
+
+#### After about 15 minutes all the jobs should show green, meaning they all worked and it should be deployed to AWS!!!
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_25.jpg" />
+</p>
+
+### 11. Accessing the Lambda Functions
+
+#### Once your deployment pipeline on GitHub succeeds you can navigate back to the AWS website.
+#### Search for the '*CloudFormation* ' service and open it.
+<p align="center">
+  <img src="assets/CLOUD_FORMATIONS_1.jpg" />
+</p>
+
+#### This will take you to a page to view the current stack and all services that were just deployed by the pipeline we just ran.
+#### All of them should say either 'CREATE_COMPLETE' or 'UPDATE_COMPLETE'. If so then WHOO HOOO!!!
+<p align="center">
+  <img src="assets/CLOUD_FORMATIONS_2.jpg" />
+</p>
+
+#### To run the functions you need to access their URL. If you select the '*log-reader-lambda-function-stack* ' from your CloudFormation stack
+you should see a pop-up similar to this
+<p align="center">
+  <img src="assets/CLOUD_FORMATIONS_1.jpg" />
+</p>
+
+#### Pressing the '*Outputs* ' tab at the top will take you to this section.
+#### Here is where you can access your URL for the reader lambda function under '*LambdaFunctionUrl* '.
+<p align="center">
+  <img src="assets/CLOUD_FORMATIONS_4.jpg" />
+</p>
+
+#### This will be the same for accessing the writer lambda function URL.
+<p align="center">
+  <img src="assets/CLOUD_FORMATIONS_3.jpg" />
+</p>
+
+
+### 12. Running the Lambda Functions
 
 <br />
 <br />
