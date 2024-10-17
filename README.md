@@ -309,7 +309,7 @@ To deploy the serverless functions to AWS, follow these steps:
 #### To run the functions you need to access their URL. If you select the '*log-reader-lambda-function-stack* ' from your CloudFormation stack
 you should see a pop-up similar to this
 <p align="center">
-  <img src="assets/CLOUD_FORMATIONS_1.jpg" />
+  <img src="assets/CLOUD_FORMATIONS_5.jpg" />
 </p>
 
 #### Pressing the '*Outputs* ' tab at the top will take you to this section.
@@ -325,6 +325,22 @@ you should see a pop-up similar to this
 
 
 ### 12. Running the Lambda Functions
+
+#### There are many ways to run and use these lambda functions. The way found best and used for my testing was to utilize an application called **Postman**.
+#### Postman allows you to send CRUD requests to URL endpoints and receive the responses.
+
+#### Here is my Postman test for the writer lambda function:
+#### Keep in mind the writer lambda function only accepts:
+- POST method requests
+- A severity of
+  - info
+  - warning
+  - error
+ 
+<p align="center">
+  <img src="assets/CLOUD_FORMATIONS_3.jpg" />
+</p>
+
 
 <br />
 <br />
