@@ -63,10 +63,207 @@ can deploy from it.
 ## Deploying Functions to AWS:
 To deploy the serverless functions to AWS, follow these steps:
 
-###1. Create a AWS Account
-I wont guide you through the creation but ensure you have an AWS account before proceeding.
+### 1. Create a AWS Account
 
-###2. 
+#### I wont guide you through the creation but ensure you have an AWS account before proceeding.
+
+### 2. Navigate to the IAM Service
+
+#### Search for and select the '*IAM* ' service from any page on the AWS website.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_1.jpg" />
+</p>
+
+#### This is what the IAM Dashboard should look like.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_2.jpg" />
+</p>
+
+### 3. Create a new IAM user
+
+#### Locate the '*User* ' section in the menu to the left.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_3.jpg" />
+</p>
+
+#### Click the '*Create user* ' button in the top left.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_4.jpg" />
+</p>
+
+#### Select a user name that is unique to any other possible users on your AWS account.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_5.jpg" />
+</p>
+
+#### Select the '*Attach policies directly* ' option.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_6.jpg" />
+</p>
+
+#### Search and select '*AdministratorAccess* ' and '*IAMFullAccess* ' policies.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_7.jpg" />
+</p>
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_8.jpg" />
+</p>
+
+#### Finally review the details and click '*Create user* '.
+
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_9.jpg" />
+</p>
+
+### 7. Create Access Key
+
+#### Naviagte back to the '*Users* ' page and you should see the new user that you created. Click the users name in blue.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_4.jpg" />
+</p>
+
+#### These are your users settings. In the navigation bar located below the '*Summary* ' select the *'Security credentials* ' section.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_10.jpg" />
+</p>
+
+#### Scoll down until you locate the '*Access Keys* ' section and Click the '*Create access key* ' button at the top right.
+#### This will take you through the process of creating a new access key we will need later.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_11.jpg" />
+</p>
+
+#### Select '*Command Line Interface (CLI)* ' for the use case. Tick the confirmation box at the bottom and press '*Next* '.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_12.jpg" />
+</p>
+
+#### You can add a description to this key if you would like but you are more than welcome to skip aswell it wont affect anything.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_13.jpg" />
+</p>
+
+#### Your Access Key has now ben created! Copy the "*Access key* ' and '*Secrect access key* ' and keep them safe as we will use them next.
+<p align="center">
+  <img src="assets/IAM_CREATE_USER_14.jpg" />
+</p>
+
+### 8. Fork the Repository
+
+#### Navigate to the top of this GitHub repsoitory and press the '*Fork* ' button located in the top right between '*Watch* ' and '*Star* '.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_1.jpg" />
+</p>
+
+#### Create a '*Fork* ' of my repository on your account. Youre welcome to reaname it and add your own description :)
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_2.jpg" />
+</p>
+
+#### This will create a forked repository on your GitHub account with all my code. We will be working in this forked repository from now on.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_4.jpg" />
+</p>
+
+#### At this point you are also able to clone the code to your machine if you wish to see how many comments I was able to fit on one file.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_5.jpg" />
+</p>
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_3.jpg" />
+</p>
+
+### 9. Add Secrets and Variables for GitHub Actiosn Pipeline
+
+#### Within your forked repository at the very top you will see a navigation bar. Press the '*Settings* ' option on the far right.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_6.jpg" />
+</p>
+
+#### In your repository settings page you will see a menu to the left side. Locate and press the '*Secrets and variabels* ' option under '*Security* '.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_7.jpg" />
+</p>
+
+#### When you click it a few options will appear. Press the one called '*Actions* '.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_8.jpg" />
+</p>
+
+#### This will open a page where we can add our Secrets and Variables for our GitHub Actions Pipeline.
+#### Press the green '*New repository secret* ' button.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_9.jpg" />
+</p>
+
+#### You need to create a secret called '*AWS_ACCESS_KEY_ID* ' and paste in the Access Key for our IAM user we created (remember the secrets I told you to keep safe).
+#### It will look something like this : **XZPMA1BCY9WQDLGT3JHK**  
+*NOTE THAT THIS IS NOT A REAL ACCESS KEY*
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_10.jpg" />
+</p>
+
+#### You will also create another secret called '*AWS_SECRET_ACCESS_KEY* ' and paste in the Secret Access Key i also told you to keep safe.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_11.jpg" />
+</p>
+
+#### You should now have these Secrets with the values inside.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_12.jpg" />
+</p>
+
+#### Just above where these Secrets are you will see a tab called '*Variables* '. Press it!!!!!!
+#### This is where we will add our Variables for our GitHub Actions Pipeline. Press the green '*New repository variable* ' button.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_13.jpg" />
+</p>
+
+#### You need to create a variable called '*AWS_REGION* ' which will hold your selected region for AWS. I use '*us-east-1* ' as my defualt.
+#### If you are unsure you can use the same region as me.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_14.jpg" />
+</p>
+
+#### Add variables called '*READER_ECR_REPO* ' & '*WRITER_ECR_REPO* ' that will hold the names of your ECR repositories for the reader and writer lambda functions.
+#### You can name these anything as long as there are no other repositories with the same name in the ECR of your chosen region.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_15.jpg" />
+</p>
+
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_16.jpg" />
+</p>
+
+#### Add variables called '*READER_FUNCTION_NAME* ' & '*WRITER_FUNCTION_NAME* ' that will hold the names of your reader and writer lambda function respectivly.
+#### Once again you can name these anything as long as there are no other lambda functions with the same name in your chosen region.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_17.jpg" />
+</p>
+
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_18.jpg" />
+</p>
+
+#### You should now have these Variables with the values inside.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_19.jpg" />
+</p>
+
+### 10. Run Pipeline and Deploy to AWS
+
+#### In the top navigation bar of your repository, click the option called '*Actions* '.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_6.jpg" />
+</p>
+
+#### This will open up your GitHub Actions page where all your pipline workflows are held.
+#### On the left hand side you will see a menu listing the currently avaliable workflows.
+#### Locate the workflow called '*Deploy log lambdas to AWS* ' and click it.
+<p align="center">
+  <img src="assets/GITHUB_DEPLOYMENT_6.jpg" />
+</p>
+
 <br />
 <br />
 
