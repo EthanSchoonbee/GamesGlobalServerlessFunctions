@@ -2,7 +2,7 @@
 <br />
 <br />
 
-## Author Details:
+# Author Details:
 
 **Full Name** - *Ethan Schoonbee*
 
@@ -16,15 +16,17 @@
 <br />
 <br />
 
-## Table of Contents:
-- Introduction
-- Project Decisions
-- Deploying Functions to AWS
-- Conclusion
+# Table of Contents:
+- [Introduction](#introduction)
+- [Project Decisions](#project-decisions)
+- [Deploying Functions to AWS](#deploying-functions-to-aws)
+- [Conclusion](#conclusion)
+<br />
+<br />
 
-------------
+---
 
-## Introduction:
+# Introduction:
 This project was developed as part of a technical assessment for Games Global and tested my practical implementation of AWS serverless functions.
 
 For this project, I chose to take some risks and utilize **TypeScript** for my language of choice as I am currently trying to learn it.
@@ -35,14 +37,15 @@ interact with each other, but I am glad I took the chance and tried it out as it
 <br />
 <br />
 
+---
 
-## Project Decisions:
+# Project Decisions:
 In this section, I want to explain some of the critical choices I made throughout the project:
 
-###   Choice of Tech Stack
+##   Choice of Tech Stack
 - **Runtime Environment:**
 
-  - I opted for **Node.js ** for its asynchronous nature, which is particularly useful for handling API requests efficiently. Additionally, the availability of libraries for **AWS** integration made it a great fit.
+  - I opted for **Node.js** because of its asynchronous nature, which is particularly useful for handling API requests efficiently. Additionally, the availability of libraries for **AWS** integration made it a great fit.
 - **Database Selection:**
 
   - **DynamoDB** was chosen because of its seamless integration with AWS services and its flexibility in managing JSON-like structures.
@@ -50,7 +53,7 @@ In this section, I want to explain some of the critical choices I made throughou
 
   - I chose **Zod** for input validation to ensure the API requests adhere to a defined schema, improving the robustness of the **Lambda** **functions**.
 
-###   Deployment
+##   Deployment
 - **GitHub Action Pipeline:**
 
   - I chose to use **GitHub Actions** and set up a deployment pipeline to automatically deploy the AWS environment and lambda functions to a specified AWS account.
@@ -60,14 +63,20 @@ can deploy from it.
 <br />
 <br />
 
-## Deploying Functions to AWS:
-To deploy the serverless functions to AWS, follow these steps:
+---
 
-### 1. Create a AWS Account
+# Deploying Functions to AWS:
+To deploy the serverless functions to AWS, follow these steps:
+<br />
+<br />
+
+## 1. Create a AWS Account
 
 #### I wont guide you through the creation but ensure you have an AWS account before proceeding.
+<br />
+<br />
 
-### 2. Navigate to the IAM Service
+## 2. Navigate to the IAM Service
 
 #### Search for and select the '*IAM* ' service from any page on the AWS website.
 <p align="center">
@@ -78,8 +87,10 @@ To deploy the serverless functions to AWS, follow these steps:
 <p align="center">
   <img src="assets/IAM_CREATE_USER_2.jpg" />
 </p>
+<br />
+<br />
 
-### 3. Create a new IAM user
+## 3. Create a new IAM user
 
 #### Locate the '*User* ' section in the menu to the left.
 <p align="center">
@@ -114,15 +125,17 @@ To deploy the serverless functions to AWS, follow these steps:
 <p align="center">
   <img src="assets/IAM_CREATE_USER_9.jpg" />
 </p>
+<br />
+<br />
 
-### 7. Create Access Key
+## 4. Create an Access Key
 
 #### Navigate back to the '*Users* ' page and you should see the new user that you created. Click the user's name in blue.
 <p align="center">
   <img src="assets/IAM_CREATE_USER_4.jpg" />
 </p>
 
-#### These are your users' settings. In the navigation bar located below the '*Summary* ' select the *'Security credentials* ' section.
+#### These are your user's settings. In the navigation bar located below the '*Summary* ' select the *'Security credentials* ' section.
 <p align="center">
   <img src="assets/IAM_CREATE_USER_10.jpg" />
 </p>
@@ -143,12 +156,14 @@ To deploy the serverless functions to AWS, follow these steps:
   <img src="assets/IAM_CREATE_USER_13.jpg" />
 </p>
 
-#### Your Access Key has now been created! Copy the "*Access key* ' and '*Secret access key* ' and keep them safe as we will use them next.
+#### Your Access Key has now been created! Copy the "*Access key* ' and '*Secret access key* ' and keep them safe as we will use them later.
 <p align="center">
   <img src="assets/IAM_CREATE_USER_14.jpg" />
 </p>
+<br />
+<br />
 
-### 8. Fork the Repository
+## 5. Fork the Repository
 
 #### Navigate to the top of this GitHub repository and press the '*Fork* ' button located in the top right between '*Watch* ' and '*Star* '.
 <p align="center">
@@ -172,8 +187,10 @@ To deploy the serverless functions to AWS, follow these steps:
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_3.jpg" />
 </p>
+<br />
+<br />
 
-### 9. Add Secrets and Variables for GitHub Actions Pipeline
+## 6. Add Secrets and Variables for GitHub Actions Pipeline
 
 #### Within your forked repository at the very top you will see a navigation bar. Press the '*Settings* ' option on the far right.
 <p align="center">
@@ -203,7 +220,7 @@ To deploy the serverless functions to AWS, follow these steps:
   <img src="assets/GITHUB_DEPLOYMENT_10.jpg" />
 </p>
 
-#### You will also create another secret called '*AWS_SECRET_ACCESS_KEY* ' and paste into the Secret Access Key I also told you to keep safe.
+#### You will also create another secret called '*AWS_SECRET_ACCESS_KEY* ' and paste in the Secret Access Key I also told you to keep safe.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_11.jpg" />
 </p>
@@ -226,7 +243,7 @@ To deploy the serverless functions to AWS, follow these steps:
 </p>
 
 #### Add variables called '*READER_ECR_REPO* ' & '*WRITER_ECR_REPO* ' that will hold the names of your ECR repositories for the reader and writer lambda functions.
-#### You can name anything as long as there are no other repositories with the same name in the ECR of your chosen region.
+#### You can name them anything as long as there are no other repositories with the same name in the ECR of your chosen region.
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_15.jpg" />
 </p>
@@ -249,8 +266,10 @@ To deploy the serverless functions to AWS, follow these steps:
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_19.jpg" />
 </p>
+<br />
+<br />
 
-### 10. Run Pipeline and Deploy to AWS
+## 7. Run Pipeline and Deploy to AWS
 
 #### In the top navigation bar of your repository, click the option called '*Actions* '.
 <p align="center">
@@ -291,8 +310,10 @@ To deploy the serverless functions to AWS, follow these steps:
 <p align="center">
   <img src="assets/GITHUB_DEPLOYMENT_25.jpg" />
 </p>
+<br />
+<br />
 
-### 11. Accessing the Lambda Functions
+## 8. Accessing the Lambda Functions
 
 #### Once your deployment pipeline on GitHub succeeds you can navigate back to the AWS website.
 #### Search for the '*CloudFormation* ' service and open it.
@@ -322,9 +343,11 @@ you should see a pop-up similar to this
 <p align="center">
   <img src="assets/CLOUD_FORMATIONS_3.jpg" />
 </p>
+<br />
+<br />
 
 
-### 12. Running the Lambda Functions
+## 9. Running the Lambda Functions
 
 #### There are many ways to run and use these lambda functions. The way found best and used for my testing was to utilize an application called **Postman**.
 #### Postman allows you to send CRUD requests to URL endpoints and receive the responses.
@@ -338,12 +361,36 @@ you should see a pop-up similar to this
   - error
  
 <p align="center">
-  <img src="assets/CLOUD_FORMATIONS_3.jpg" />
+  <img src="assets/POSTMAN_WRITER.jpg" />
 </p>
 
+#### Here is my Postman test for the reader lambda function:
+#### Keep in mind the reader lambda function only accepts:
+- GET method requests
+ 
+<p align="center">
+  <img src="assets/POSTMAN_READER.jpg" />
+</p>
+<br />
+<br />
+
+## 10. Tearing down the CloudFormation Stack (NB)
+
+#### Make sure to tear down your CloudFormation stack when you are done using and testing the lambda functions as Private Link used to access DynamoDB costs money on a time usage basis.
+#### Because some stacks depend on others for resources make sure to tear down the stacks in this order:
+
+#### 1. log-reader-lambda-function-stack
+#### 2. log-writer-lambda-function-stack
+#### 3. dynamodb-stack
+#### 4. private-link-stack
+#### 5. security-groups-stack
+#### 6. ecr-stack
+#### 7. network-stack
 
 <br />
 <br />
 
 ## Conclusion:
-This project provided a valuable opportunity to explore serverless architectures, and I gained hands-on experience with AWS Lambda and DynamoDB. The lessons learned in scalability and efficient resource management will guide future projects. I hope this serves as a solid foundation for building scalable, serverless applications.
+This project provided a valuable opportunity to explore serverless architectures, and I gained hands-on experience with AWS Lambda, DynamoDB, TypeScript, and setting up a CI/CD pipeline with GitHub Actions. Despite the challenges, especially with the AWS environment, I found the experience highly rewarding and educational.
+<br />
+<br />
