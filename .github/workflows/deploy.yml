@@ -3,7 +3,7 @@
 # DATE CREATED: 15/10/2024
 # LAST MODIFIED: 16/10/2024
 
-name: Deploy to ECR repository
+name: Deploy log lambdas to AWS
 
 # Trigger deployment on push to specified  branches
 on:
